@@ -5,8 +5,8 @@
 
 <map version="2.0">
 
-    <mapID target="fuzzydectreeClassif" url="fuzzydectree/FuzzyDecTreeClassification.html"/>
-    <mapID target="genericClassifier" url="fuzzydectree/GenericClassifier.html"/>
-    <mapID target="intertidalFlatClassifier" url="fuzzydectree/IntertidalFlatClassifier.html"/>
+    <mapID target="slopeCalculation" url="slope/SlopeAspectOrientation.html"/>
+    <mapID target="slopeCalculationAlgorithm" url="slope/SlopeAspectOrientationAlgorithmDescription.html"/>
+    <mapID target="slopeCalculationProcessor" url="slope/SlopeAspectOrientationProcessorDescription.html"/>
 
 </map>

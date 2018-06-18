@@ -4,42 +4,27 @@
 
     <folder name="Actions">
         <folder name="Operators">
-            <file name="org-esa-snap-fuzzydectree-GenericClassifierOpAction.instance">
+            <file name="org-esa-snap-slope-SlopeAspectOrientationOpAction.instance">
                 <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
                 <attr name="delegate" methodvalue="org.esa.snap.core.gpf.ui.DefaultOperatorAction.create"/>
-                <attr name="displayName" stringvalue="Generic Classifier"/>
-                <attr name="operatorName" stringvalue="GenericClassifier"/>
-                <attr name="dialogTitle" stringvalue="Generic Classifier v0.9-SNAPSHOT"/>
-                <attr name="targetProductNameSuffix" stringvalue="_fuzzydectree"/>
-                <attr name="helpId" stringvalue="fuzzydectreeClassif"/>
-            </file>
-            <file name="org-esa-snap-fuzzydectree-IntertidalFlatClassifierOpAction.instance">
-                <attr name="instanceCreate" methodvalue="org.openide.awt.Actions.alwaysEnabled"/>
-                <attr name="delegate" methodvalue="org.esa.snap.core.gpf.ui.DefaultOperatorAction.create"/>
-                <attr name="displayName" stringvalue="Intertidal Flat Classifier"/>
-                <attr name="operatorName" stringvalue="IntertidalFlatClassifier"/>
-                <attr name="dialogTitle" stringvalue="Intertidal Flat Classifier v0.9-SNAPSHOT"/>
-                <attr name="targetProductNameSuffix" stringvalue="_fuzzydectree"/>
-                <attr name="helpId" stringvalue="fuzzydectreeClassif"/>
+                <attr name="displayName" stringvalue="Slope Calculation"/>
+                <attr name="operatorName" stringvalue="SlopeAspectOrientation"/>
+                <attr name="dialogTitle" stringvalue="Slope Calculation v0.8"/>
+                <attr name="targetProductNameSuffix" stringvalue="_slope"/>
+                <attr name="helpId" stringvalue="slopeCalculation"/>
             </file>
         </folder>
     </folder>
 
     <folder name="Menu">
-        <folder name="Raster">
-            <folder name="Classification">
-                <folder name="Fuzzy Classification">
-                    <file name="org-esa-snap-fuzzydectree-GenericClassifierOpAction.shadow">
-                        <attr name="originalFile" stringvalue="Actions/Operators/org-esa-snap-fuzzydectree-GenericClassifierOpAction.instance"/>
-                        <attr name="position" intvalue="1"/>
-                        <attr name="displayName" stringvalue="Fuzzy Classification"/>
-                    </file>
-                    <file name="org-esa-snap-fuzzydectree-IntertidalFlatClassifierOpAction.shadow">
-                        <attr name="originalFile" stringvalue="Actions/Operators/org-esa-snap-fuzzydectree-IntertidalFlatClassifierOpAction.instance"/>
-                        <attr name="position" intvalue="1"/>
-                        <attr name="displayName" stringvalue="Fuzzy Classification"/>
-                    </file>
-                </folder>
+        <folder name="Optical">
+            <folder name="Preprocessing">
+                <file name="org-esa-snap-slope-SlopeAspectOrientationOpAction.shadow">
+                    <attr name="originalFile"
+                          stringvalue="Actions/Operators/org-esa-snap-slope-SlopeAspectOrientationOpAction.instance"/>
+                    <attr name="position" intvalue="1"/>
+                    <attr name="displayName" stringvalue="Slope Calculation"/>
+                </file>
             </folder>
         </folder>
     </folder>

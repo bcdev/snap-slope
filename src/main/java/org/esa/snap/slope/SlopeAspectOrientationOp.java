@@ -11,6 +11,7 @@ import org.esa.snap.core.gpf.annotations.Parameter;
 import org.esa.snap.core.gpf.annotations.SourceProduct;
 import org.esa.snap.core.gpf.annotations.TargetProduct;
 import org.esa.snap.core.util.ProductUtils;
+import org.esa.snap.core.util.math.MathUtils;
 import org.opengis.referencing.operation.MathTransform;
 
 import javax.media.jai.BorderExtender;
@@ -19,19 +20,25 @@ import java.awt.geom.AffineTransform;
 import java.util.Map;
 
 /**
- * Performs intertidal flat classification based on fuzzy decision tree.
+ * Computes Slope and aspect for an arbitrary product with elevation data and a CRS geocoding.
  *
- * @author olafd
+ * @author TonioF, olafd
  */
-@OperatorMetadata(alias = "IntertidalFlatClassifier", version = "0.9-SNAPSHOT",
-        authors = "Olaf Danne, Norman Fomferra (Brockmann Consult)",
-        category = "Classification",
-        copyright = "Copyright (C) 2018 by Brockmann Consult",
-        description = "Performs intertidal flat classification based on fuzzy decision tree.")
+@OperatorMetadata(alias = "SlopeAspectOrientation",
+        version = "1.0",
+        internal = true,
+        authors = "Tonio Fincke, Olaf Danne",
+        copyright = "(c) 2018 by Brockmann Consult",
+        description = "Computes Slope and aspect for an arbitrary product with elevation data and a CRS geocoding.")
 public class SlopeAspectOrientationOp extends Operator {
 
-    @Parameter(description = "Name of elevation band in source product.")
+    @Parameter(defaultValue = "elevation",
+            description = "Name of elevation band in source product.")
     private String elevationBandName;
+
+    @Parameter(defaultValue = "false",
+            description = "If selected, elevation source band will be written to target product.")
+    private boolean copyElevationBand;
 
     @SourceProduct
     private Product sourceProduct;
@@ -44,20 +51,15 @@ public class SlopeAspectOrientationOp extends Operator {
     private Band elevationBand;
     private Band slopeBand;
     private Band aspectBand;
-    private Band orientationBand;
     private final static String TARGET_PRODUCT_NAME = "Slope-Aspect-Orientation";
     private final static String TARGET_PRODUCT_TYPE = "slope-aspect-orientation";
     final static String SLOPE_BAND_NAME = "slope";
     final static String ASPECT_BAND_NAME = "aspect";
-    final static String ORIENTATION_BAND_NAME = "orientation";
     private final static String SLOPE_BAND_DESCRIPTION = "Slope of each pixel as angle";
     private final static String ASPECT_BAND_DESCRIPTION =
             "Aspect of each pixel as angle between raster -Y direction and steepest slope, clockwise";
-    private final static String ORIENTATION_BAND_DESCRIPTION =
-            "Orientation of each pixel as angle between east and raster X direction, clockwise";
-    private final static String SLOPE_BAND_UNIT = "rad [0..pi/2]";
-    private final static String ASPECT_BAND_UNIT = "rad [-pi..pi]";
-    private final static String ORIENTATION_BAND_UNIT = "rad [-pi..pi]";
+    private final static String SLOPE_BAND_UNIT = "deg [0..90]";
+    private final static String ASPECT_BAND_UNIT = "deg [0..360]";
 
     @Override
     public void initialize() throws OperatorException {
@@ -82,19 +84,13 @@ public class SlopeAspectOrientationOp extends Operator {
             throw new OperatorException("Elevation band required to compute slope or aspect");
         }
         targetProduct = createTargetProduct();
-        slopeBand = createBand(SLOPE_BAND_NAME, SLOPE_BAND_DESCRIPTION, SLOPE_BAND_UNIT);
+        if (copyElevationBand) {
+            ProductUtils.copyBand(elevationBandName, sourceProduct, targetProduct, true);
+            slopeBand = createBand(SLOPE_BAND_NAME, SLOPE_BAND_DESCRIPTION, SLOPE_BAND_UNIT);
+        }
         aspectBand = createBand(ASPECT_BAND_NAME, ASPECT_BAND_DESCRIPTION, ASPECT_BAND_UNIT);
-        orientationBand = createBand(ORIENTATION_BAND_NAME, ORIENTATION_BAND_DESCRIPTION, ORIENTATION_BAND_UNIT);
+//        orientationBand = createBand(ORIENTATION_BAND_NAME, ORIENTATION_BAND_DESCRIPTION, ORIENTATION_BAND_UNIT);
         setTargetProduct(targetProduct);
-    }
-
-    private Band createBand(String bandName, String description, String unit) {
-        Band band = targetProduct.addBand(bandName, ProductData.TYPE_FLOAT32);
-        band.setDescription(description);
-        band.setUnit(unit);
-        band.setNoDataValue(-9999.);
-        band.setNoDataValueUsed(true);
-        return band;
     }
 
     @Override
@@ -103,7 +99,7 @@ public class SlopeAspectOrientationOp extends Operator {
         final Rectangle sourceRectangle = getSourceRectangle(targetRectangle);
         final BorderExtender borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
         final Tile elevationTile = getSourceTile(elevationBand, sourceRectangle, borderExtender);
-        float[] elevationData = elevationTile.getDataBufferFloat();
+        final float[] elevationData = getAsFloatArray(elevationTile);
         float[] sourceLatitudes = new float[(int) (sourceRectangle.getWidth() * sourceRectangle.getHeight())];
         float[] sourceLongitudes = new float[(int) (sourceRectangle.getWidth() * sourceRectangle.getHeight())];
         ((CrsGeoCoding) getSourceProduct().getSceneGeoCoding()).getPixels((int) sourceRectangle.getMinX(),
@@ -115,16 +111,13 @@ public class SlopeAspectOrientationOp extends Operator {
         int sourceIndex = sourceRectangle.width;
         final Tile slopeTile = targetTiles.get(slopeBand);
         final Tile aspectTile = targetTiles.get(aspectBand);
-        final Tile orientationTile = targetTiles.get(orientationBand);
         for (int y = targetRectangle.y; y < targetRectangle.y + targetRectangle.height; y++) {
             sourceIndex++;
             for (int x = targetRectangle.x; x < targetRectangle.x + targetRectangle.width; x++) {
                 final float[] slopeAndAspect = computeSlopeAndAspect(elevationData, sourceIndex,
                                                                      spatialResolution, sourceRectangle.width);
-                final float orientation = computeOrientation(sourceLatitudes, sourceLongitudes, sourceIndex);
-                slopeTile.setSample(x, y, slopeAndAspect[0]);
-                aspectTile.setSample(x, y, slopeAndAspect[1]);
-                orientationTile.setSample(x, y, orientation);
+                slopeTile.setSample(x, y, slopeAndAspect[0] * MathUtils.RTOD);
+                aspectTile.setSample(x, y, slopeAndAspect[1] * MathUtils.RTOD);
                 sourceIndex++;
             }
             sourceIndex++;
@@ -134,6 +127,7 @@ public class SlopeAspectOrientationOp extends Operator {
     /* package local for testing */
     static float[] computeSlopeAndAspect(float[] elevationData, int sourceIndex, double spatialResolution,
                                          int sourceWidth) {
+
         float elevA1 = elevationData[sourceIndex - sourceWidth - 1];
         float elevA2 = elevationData[sourceIndex - sourceWidth];
         float elevA3 = elevationData[sourceIndex - sourceWidth + 1];
@@ -142,11 +136,16 @@ public class SlopeAspectOrientationOp extends Operator {
         float elevA7 = elevationData[sourceIndex + sourceWidth - 1];
         float elevA8 = elevationData[sourceIndex + sourceWidth];
         float elevA9 = elevationData[sourceIndex + sourceWidth + 1];
+
         float b = (elevA3 + 2 * elevA6 + elevA9 - elevA1 - 2 * elevA4 - elevA7) / 8f;
         float c = (elevA1 + 2 * elevA2 + elevA3 - elevA7 - 2 * elevA8 - elevA9) / 8f;
         float slope = (float) Math.atan(Math.sqrt(Math.pow(b / spatialResolution, 2) +
                                                           Math.pow(c / spatialResolution, 2)));
         float aspect = (float) Math.atan2(-b, -c);
+        if (aspect < 0.0f) {
+//             map from [-180, 180] into [0, 360], see e.g. https://www.e-education.psu.edu/geog480/node/490
+            aspect += 360.0f;
+        }
         return new float[]{slope, aspect};
     }
 
@@ -175,7 +174,45 @@ public class SlopeAspectOrientationOp extends Operator {
         return targetProduct;
     }
 
+    private static float[] getAsFloatArray(Tile tile) {
+        ProductData dataBuffer = tile.getDataBuffer();
+        float[] dataArrFloat = new float[dataBuffer.getNumElems()];
+        switch (dataBuffer.getType()) {
+            case ProductData.TYPE_INT16:
+                for (int i = 0; i < dataBuffer.getNumElems(); i++) {
+                    dataArrFloat[i] = (float) tile.getDataBufferShort()[i];
+                }
+                break;
+            case ProductData.TYPE_INT32:
+                for (int i = 0; i < dataBuffer.getNumElems(); i++) {
+                    dataArrFloat[i] = (float) tile.getDataBufferInt()[i];
+                }
+                break;
+            case ProductData.TYPE_FLOAT32:
+                for (int i = 0; i < dataBuffer.getNumElems(); i++) {
+                    dataArrFloat[i] = tile.getDataBufferFloat()[i];
+                }
+                break;
+            case ProductData.TYPE_FLOAT64:
+                for (int i = 0; i < dataBuffer.getNumElems(); i++) {
+                    dataArrFloat[i] = (float) tile.getDataBufferDouble()[i];
+                }
+                break;
+            default:
+                throw new OperatorException("Source product data type '" + dataBuffer.getTypeString() +
+                                                    "' not supported.");
+        }
+        return dataArrFloat;
+    }
 
+    private Band createBand(String bandName, String description, String unit) {
+        Band band = targetProduct.addBand(bandName, ProductData.TYPE_FLOAT32);
+        band.setDescription(description);
+        band.setUnit(unit);
+        band.setNoDataValue(-9999.);
+        band.setNoDataValueUsed(true);
+        return band;
+    }
 
     public static class Spi extends OperatorSpi {
 
