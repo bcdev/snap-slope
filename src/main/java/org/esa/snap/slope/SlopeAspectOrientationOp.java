@@ -40,7 +40,8 @@ public class SlopeAspectOrientationOp extends Operator {
             description = "If selected, elevation source band will be written to target product.")
     private boolean copyElevationBand;
 
-    @SourceProduct
+    @SourceProduct(description = "Source product containing elevation band.",
+            label = "Elevation product")
     private Product sourceProduct;
 
     @TargetProduct
@@ -86,10 +87,9 @@ public class SlopeAspectOrientationOp extends Operator {
         targetProduct = createTargetProduct();
         if (copyElevationBand) {
             ProductUtils.copyBand(elevationBandName, sourceProduct, targetProduct, true);
-            slopeBand = createBand(SLOPE_BAND_NAME, SLOPE_BAND_DESCRIPTION, SLOPE_BAND_UNIT);
         }
+        slopeBand = createBand(SLOPE_BAND_NAME, SLOPE_BAND_DESCRIPTION, SLOPE_BAND_UNIT);
         aspectBand = createBand(ASPECT_BAND_NAME, ASPECT_BAND_DESCRIPTION, ASPECT_BAND_UNIT);
-//        orientationBand = createBand(ORIENTATION_BAND_NAME, ORIENTATION_BAND_DESCRIPTION, ORIENTATION_BAND_UNIT);
         setTargetProduct(targetProduct);
     }
 
@@ -144,7 +144,7 @@ public class SlopeAspectOrientationOp extends Operator {
         float aspect = (float) Math.atan2(-b, -c);
         if (aspect < 0.0f) {
 //             map from [-180, 180] into [0, 360], see e.g. https://www.e-education.psu.edu/geog480/node/490
-            aspect += 360.0f;
+            aspect += 2.0*Math.PI;
         }
         return new float[]{slope, aspect};
     }

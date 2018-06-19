@@ -17,18 +17,10 @@ public class SlopeAspectOrientationOpTest {
                 14.0f, 14.0f, 12.0f, 14.0f, 11.0f, 11.0f};
         final float[] slopeAndAspect_7 = SlopeAspectOrientationOp.computeSlopeAndAspect(altitude, 7, 10, 6);
         final float[] slopeAndAspect_8 = SlopeAspectOrientationOp.computeSlopeAndAspect(altitude, 8, 10, 6);
-        final float[] slopeAndAspect_9 = SlopeAspectOrientationOp.computeSlopeAndAspect(altitude, 9, 10, 6);
         final float[] slopeAndAspect_10 = SlopeAspectOrientationOp.computeSlopeAndAspect(altitude, 10, 10, 6);
-        final float[] slopeAndAspect_13 = SlopeAspectOrientationOp.computeSlopeAndAspect(altitude, 13, 10, 6);
-        final float[] slopeAndAspect_14 = SlopeAspectOrientationOp.computeSlopeAndAspect(altitude, 14, 10, 6);
         final float[] slopeAndAspect_15 = SlopeAspectOrientationOp.computeSlopeAndAspect(altitude, 15, 10, 6);
-        final float[] slopeAndAspect_16 = SlopeAspectOrientationOp.computeSlopeAndAspect(altitude, 16, 10, 6);
-        final float[] slopeAndAspect_19 = SlopeAspectOrientationOp.computeSlopeAndAspect(altitude, 19, 10, 6);
-        final float[] slopeAndAspect_20 = SlopeAspectOrientationOp.computeSlopeAndAspect(altitude, 20, 10, 6);
-        final float[] slopeAndAspect_21 = SlopeAspectOrientationOp.computeSlopeAndAspect(altitude, 21, 10, 6);
         final float[] slopeAndAspect_22 = SlopeAspectOrientationOp.computeSlopeAndAspect(altitude, 22, 10, 6);
         final float[] slopeAndAspect_25 = SlopeAspectOrientationOp.computeSlopeAndAspect(altitude, 25, 10, 6);
-        final float[] slopeAndAspect_26 = SlopeAspectOrientationOp.computeSlopeAndAspect(altitude, 26, 10, 6);
         final float[] slopeAndAspect_27 = SlopeAspectOrientationOp.computeSlopeAndAspect(altitude, 27, 10, 6);
         final float[] slopeAndAspect_28 = SlopeAspectOrientationOp.computeSlopeAndAspect(altitude, 28, 10, 6);
 
@@ -38,43 +30,26 @@ public class SlopeAspectOrientationOpTest {
                 0.070593186f, 0.070593186f, 0.11134102f, 0.11134102f,
                 0.11134102f, 0.049958397f, 0.0f, 0.14048971f};
         float[] expectedAspect = {
-                -1.28474486f, -1.62733972f, 1.96140337f, 1.57079637f,
+                4.9984402f, 4.6558456f, 1.96140337f, 1.57079637f,
                 -0.95054686f, -2.12064958f, 3.01189017f, 1.57079637f,
                 0.78539819f, -2.3561945f, -2.67794514f, 2.67794514f,
-                1.10714877f, -0.f, -3.14159274f, 2.3561945f};
+                1.10714877f, -0.f, 3.1415925f, 2.3561945f};
 
         assertEquals(slopeAndAspect_7[0], expectedSlope[0], 1e-7);
         assertEquals(slopeAndAspect_8[0], expectedSlope[1], 1e-7);
-        assertEquals(slopeAndAspect_9[0], expectedSlope[2], 1e-7);
         assertEquals(slopeAndAspect_10[0], expectedSlope[3], 1e-7);
-        assertEquals(slopeAndAspect_13[0], expectedSlope[4], 1e-7);
-        assertEquals(slopeAndAspect_14[0], expectedSlope[5], 1e-7);
-        assertEquals(slopeAndAspect_15[0], expectedSlope[6], 1e-7);
-        assertEquals(slopeAndAspect_16[0], expectedSlope[7], 1e-7);
-        assertEquals(slopeAndAspect_19[0], expectedSlope[8], 1e-7);
-        assertEquals(slopeAndAspect_20[0], expectedSlope[9], 1e-7);
-        assertEquals(slopeAndAspect_21[0], expectedSlope[10], 1e-7);
         assertEquals(slopeAndAspect_22[0], expectedSlope[11], 1e-7);
         assertEquals(slopeAndAspect_25[0], expectedSlope[12], 1e-7);
-        assertEquals(slopeAndAspect_26[0], expectedSlope[13], 1e-7);
         assertEquals(slopeAndAspect_27[0], expectedSlope[14], 1e-7);
         assertEquals(slopeAndAspect_28[0], expectedSlope[15], 1e-7);
 
-        assertEquals(slopeAndAspect_7[1], 360.0f + expectedAspect[0], 1e-8);
-        assertEquals(slopeAndAspect_8[1], 360.0f + expectedAspect[1], 1e-8);
-        assertEquals(slopeAndAspect_9[1], expectedAspect[2], 1e-8);
+        assertEquals(slopeAndAspect_7[1], expectedAspect[0], 1e-8);
+        assertEquals(slopeAndAspect_8[1], expectedAspect[1], 1e-8);
         assertEquals(slopeAndAspect_10[1], expectedAspect[3], 1e-8);
-        assertEquals(slopeAndAspect_13[1], 360.0f + expectedAspect[4], 1e-8);
-        assertEquals(slopeAndAspect_14[1], 360.0f + expectedAspect[5], 1e-8);
         assertEquals(slopeAndAspect_15[1], expectedAspect[6], 1e-8);
-        assertEquals(slopeAndAspect_16[1], expectedAspect[7], 1e-8);
-        assertEquals(slopeAndAspect_19[1], expectedAspect[8], 1e-8);
-        assertEquals(slopeAndAspect_20[1], 360.0f + expectedAspect[9], 1e-8);
-        assertEquals(slopeAndAspect_21[1], 360.0f + expectedAspect[10], 1e-8);
         assertEquals(slopeAndAspect_22[1], expectedAspect[11], 1e-8);
         assertEquals(slopeAndAspect_25[1], expectedAspect[12], 1e-8);
-        assertEquals(slopeAndAspect_26[1], expectedAspect[13], 1e-8);
-        assertEquals(slopeAndAspect_27[1], 360.0f + expectedAspect[14], 1e-8);
+        assertEquals(slopeAndAspect_27[1], expectedAspect[14], 1e-8);
         assertEquals(slopeAndAspect_28[1], expectedAspect[15], 1e-8);
     }
 

@@ -11,6 +11,7 @@ import org.esa.snap.core.util.math.MathUtils;
 import org.geotools.referencing.CRS;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.TransformException;
@@ -76,19 +77,20 @@ public class SlopeAspectOrientationIntegrationTest {
         final Band aspectBand = targetProduct.getBand(SlopeAspectOrientationOp.ASPECT_BAND_NAME);
 
         float[][] expectedSlope = new float[][]{
-                {0.21798114f, 0.32035214f, 0.11440312f, 0.22131443f},
-                {0.10711748f, 0.22345093f, 0.14396477f, 0.124354996f},
-                {0.070593186f, 0.070593186f, 0.11134102f, 0.11134102f},
-                {0.11134102f, 0.049958397f, 0.0f, 0.14048971f}};
+                {12.4894f, 18.354824f, 6.554816f, 12.680384f},
+                {6.1373796f, 12.802796f, 8.248572f, 7.125016f},
+                {4.044691f, 4.044691f, 6.37937f, 6.37937f},
+                {6.37937f, 2.8624053f, 0.0f, 8.049467f}};
+
         float[][] expectedAspect = {
-                {-1.28474486f, -1.62733972f, 1.96140337f, 1.57079637f},
-                {-0.95054686f, -2.12064958f, 3.01189017f, 1.57079637f},
-                {0.78539819f, -2.3561945f, -2.67794514f, 2.67794514f},
-                {1.10714877f, -0.f, -3.14159274f, 2.3561945f}};
+                {286.38953f, 266.7603f, 112.380135f, 90.0f},
+                {305.53766f, 238.49573f, 172.56859f, 90.0f},
+                {45.0f, 225.0f, 206.56505f, 153.43495f},
+                {63.43495f, -0.f, 179.99998f, 135.0f}};
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                assertEquals(slopeBand.getSampleFloat(x, y), expectedSlope[y][x] * MathUtils.RTOD, 1e-5);
-                assertEquals(aspectBand.getSampleFloat(x, y), expectedAspect[y][x] * MathUtils.RTOD, 1e-5);
+                assertEquals(slopeBand.getSampleFloat(x, y), expectedSlope[y][x], 1e-5);
+                assertEquals(aspectBand.getSampleFloat(x, y), expectedAspect[y][x], 1e-5);
             }
         }
     }
@@ -122,20 +124,20 @@ public class SlopeAspectOrientationIntegrationTest {
         final Band aspectBand = targetProduct.getBand(SlopeAspectOrientationOp.ASPECT_BAND_NAME);
 
         float[][] expectedSlope = new float[][]{
-                {0.21798114f, 0.303112f, 0.126791f, 0.222631f},
-                {0.10711748f, 0.2152724f, 0.1267916f, 0.126791f},
-                {0.070593186f, 0.070593186f, 0.11134102f, 0.11134102f},
-                {0.11134102f, 0.049958397f, 0.0f, 0.14048971f}};
-        float[][] expectedAspect = {
-                {-1.28474486f, -1.610775f, 1.768191f, 1.460139f},
-                {-0.95054686f, -2.11121f, 2.944197f, 1.3734f},
-                {0.78539819f, -2.3561945f, -2.67794514f, 2.67794514f},
-                {1.10714877f, -0.f, -3.14159274f, 2.3561945f}};
+                {12.4894f, 17.36706f, 7.264626f, 12.75587f},
+                {6.1373796f, 12.3342f, 7.2646269f, 7.2646269f},
+                {4.044691f, 4.044691f, 6.37937f, 6.37937f},
+                {6.37937f, 2.8624053f, 0.0f, 8.049467f}};
 
+        float[][] expectedAspect = {
+                {286.38953f, 267.70941f, 101.30993f, 83.65981f},
+                {305.53766f, 239.036239f, 168.690078f, 78.6900711f},
+                {45.0f, 225.0f, 206.56505f, 153.43495f},
+                {63.43495f, -0.f, 179.99998f, 135.0f}};
         for (int y = 0; y < height; y++) {
             for (int x = 0; x < width; x++) {
-                assertEquals(slopeBand.getSampleFloat(x, y) * MathUtils.DTOR, expectedSlope[y][x], 1e-5);
-                assertEquals(aspectBand.getSampleFloat(x, y) * MathUtils.DTOR, expectedAspect[y][x], 1e-5);
+                assertEquals(slopeBand.getSampleFloat(x, y), expectedSlope[y][x], 1e-5);
+                assertEquals(aspectBand.getSampleFloat(x, y), expectedAspect[y][x], 1e-5);
             }
         }
     }
