@@ -4,7 +4,7 @@ import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
 
-public class SlopeAspectOrientationOpTest {
+public class SlopeCalculationOpTest {
 
     @Test
     public void computeSlopeAndAspect() {
@@ -15,14 +15,14 @@ public class SlopeAspectOrientationOpTest {
                 13.0f, 13.0f, 11.0f, 13.0f, 14.0f, 14.0f,
                 14.0f, 14.0f, 12.0f, 14.0f, 11.0f, 11.0f,
                 14.0f, 14.0f, 12.0f, 14.0f, 11.0f, 11.0f};
-        final float[] slopeAndAspect_7 = SlopeAspectOrientationOp.computeSlopeAndAspect(altitude, 7, 10, 6);
-        final float[] slopeAndAspect_8 = SlopeAspectOrientationOp.computeSlopeAndAspect(altitude, 8, 10, 6);
-        final float[] slopeAndAspect_10 = SlopeAspectOrientationOp.computeSlopeAndAspect(altitude, 10, 10, 6);
-        final float[] slopeAndAspect_15 = SlopeAspectOrientationOp.computeSlopeAndAspect(altitude, 15, 10, 6);
-        final float[] slopeAndAspect_22 = SlopeAspectOrientationOp.computeSlopeAndAspect(altitude, 22, 10, 6);
-        final float[] slopeAndAspect_25 = SlopeAspectOrientationOp.computeSlopeAndAspect(altitude, 25, 10, 6);
-        final float[] slopeAndAspect_27 = SlopeAspectOrientationOp.computeSlopeAndAspect(altitude, 27, 10, 6);
-        final float[] slopeAndAspect_28 = SlopeAspectOrientationOp.computeSlopeAndAspect(altitude, 28, 10, 6);
+        final float[] slopeAndAspect_7 = SlopeCalculationOp.computeSlopeAndAspect(altitude, 7, 10, 6);
+        final float[] slopeAndAspect_8 = SlopeCalculationOp.computeSlopeAndAspect(altitude, 8, 10, 6);
+        final float[] slopeAndAspect_10 = SlopeCalculationOp.computeSlopeAndAspect(altitude, 10, 10, 6);
+        final float[] slopeAndAspect_15 = SlopeCalculationOp.computeSlopeAndAspect(altitude, 15, 10, 6);
+        final float[] slopeAndAspect_22 = SlopeCalculationOp.computeSlopeAndAspect(altitude, 22, 10, 6);
+        final float[] slopeAndAspect_25 = SlopeCalculationOp.computeSlopeAndAspect(altitude, 25, 10, 6);
+        final float[] slopeAndAspect_27 = SlopeCalculationOp.computeSlopeAndAspect(altitude, 27, 10, 6);
+        final float[] slopeAndAspect_28 = SlopeCalculationOp.computeSlopeAndAspect(altitude, 28, 10, 6);
 
         float[] expectedSlope = new float[]{
                 0.21798114f, 0.32035214f, 0.11440312f, 0.22131443f,
@@ -33,7 +33,7 @@ public class SlopeAspectOrientationOpTest {
                 4.9984402f, 4.6558456f, 1.96140337f, 1.57079637f,
                 -0.95054686f, -2.12064958f, 3.01189017f, 1.57079637f,
                 0.78539819f, -2.3561945f, -2.67794514f, 2.67794514f,
-                1.10714877f, -0.f, 3.1415925f, 2.3561945f};
+                1.10714877f, -0.f, Float.NaN, 2.3561945f};
 
         assertEquals(slopeAndAspect_7[0], expectedSlope[0], 1e-7);
         assertEquals(slopeAndAspect_8[0], expectedSlope[1], 1e-7);
@@ -63,14 +63,14 @@ public class SlopeAspectOrientationOpTest {
                 10.01f, 10.21f, 10.41f, 10.61f,
                 10.02f, 10.22f, 10.42f, 10.62f,
                 10.03f, 10.23f, 10.43f, 10.63f};
-        final float orientation_1 = SlopeAspectOrientationOp.computeOrientation(latitudes, longitudes, 1);
-        final float orientation_2 = SlopeAspectOrientationOp.computeOrientation(latitudes, longitudes, 2);
-        final float orientation_5 = SlopeAspectOrientationOp.computeOrientation(latitudes, longitudes, 5);
-        final float orientation_6 = SlopeAspectOrientationOp.computeOrientation(latitudes, longitudes, 6);
-        final float orientation_9 = SlopeAspectOrientationOp.computeOrientation(latitudes, longitudes, 9);
-        final float orientation_10 = SlopeAspectOrientationOp.computeOrientation(latitudes, longitudes, 10);
-        final float orientation_13 = SlopeAspectOrientationOp.computeOrientation(latitudes, longitudes, 13);
-        final float orientation_14 = SlopeAspectOrientationOp.computeOrientation(latitudes, longitudes, 14);
+        final float orientation_1 = SlopeCalculationOp.computeOrientation(latitudes, longitudes, 1);
+        final float orientation_2 = SlopeCalculationOp.computeOrientation(latitudes, longitudes, 2);
+        final float orientation_5 = SlopeCalculationOp.computeOrientation(latitudes, longitudes, 5);
+        final float orientation_6 = SlopeCalculationOp.computeOrientation(latitudes, longitudes, 6);
+        final float orientation_9 = SlopeCalculationOp.computeOrientation(latitudes, longitudes, 9);
+        final float orientation_10 = SlopeCalculationOp.computeOrientation(latitudes, longitudes, 10);
+        final float orientation_13 = SlopeCalculationOp.computeOrientation(latitudes, longitudes, 13);
+        final float orientation_14 = SlopeCalculationOp.computeOrientation(latitudes, longitudes, 14);
         assertEquals(-0.07763171, orientation_1, 1e-8);
         assertEquals(-0.07764761, orientation_2, 1e-8);
         assertEquals(-0.07779299, orientation_5, 1e-8);
@@ -81,4 +81,15 @@ public class SlopeAspectOrientationOpTest {
         assertEquals(-0.07813445, orientation_14, 1e-8);
     }
 
+    @Test
+    public void testComputeDistance() {
+        // numbers from https://www.movable-type.co.uk/scripts/latlong.html
+        double lat1 = 50.0 + 3.0/60.0 + 59.0/3600.0;
+        double lon1 = -5.0 - 42.0/60.0 - 53.0/3600.0;
+        double lat2 = 58.0 + 38.0/60.0 + 38.0/3600.0;
+        double lon2 = -3.0 - 4.0/60.0 - 12.0/3600.0;
+
+        double distance = SlopeCalculationOp.computeDistance(lat1, lon1, lat2, lon2);
+        assertEquals(968.9, distance, 0.1);
+    }
 }

@@ -5,8 +5,9 @@
 
 <map version="2.0">
 
-    <mapID target="slopeCalculation" url="slope/SlopeAspectOrientation.html"/>
-    <mapID target="slopeCalculationAlgorithm" url="slope/SlopeAspectOrientationAlgorithmDescription.html"/>
-    <mapID target="slopeCalculationProcessor" url="slope/SlopeAspectOrientationProcessorDescription.html"/>
+    <mapID target="slopeCalculation" url="slope/SlopeCalculation.html"/>
+    <mapID target="slopeCalculationAlgorithm" url="slope/SlopeCalculationAlgorithmDescription.html"/>
+    <mapID target="slopeCalculationProcessor" url="slope/SlopeCalculationProcessorDescription.html"/>
+    <mapID target="slopeCalculationCommandLine" url="slope/SlopeCalculationCommandLine.html"/>
 
 </map>

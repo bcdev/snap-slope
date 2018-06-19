@@ -16,7 +16,7 @@
 
 <html>
 <head>
-    <title>SNAP Data Processors - Fuzzy Decision Tree Classifiers</title>
+    <title>SNAP Data Processors - Slope Calculation</title>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
     <link rel="stylesheet" href="../style.css">
 </head>
@@ -25,17 +25,25 @@
 <table class="header">
     <tr class="header">
         <td class="header">&nbsp;
-            Fuzzy Decision Tree Classifiers</td>
+            Slope Calculation</td>
         <td class="header" align="right"><a href="nbdocs://org.esa.snap.snap.help/org/esa/snap/snap/help/docs/general/overview/SnapOverview.html"><img src="../images/snap_header.jpg" border=0></a>
         </td>
     </tr>
 </table>
 
+<p>
+    The Slope Calculation processor provides the computation of terrain slope and aspect angle from
+    a given altitude band in the source product. Slope and aspect are simply computed from the altitudes
+    in a moving 3x3 pixel window around the considered pixel.
 
-<p><a href="SlopeAspectOrientationProcessorDescription.html">Generic Classifier</a></p>
-
-<p><a href="SlopeAspectOrientation.html">Intertidal Flat Classifier</a></p>
+    The computation is completely sensor independent. The source product just needs to contain an altitude band,
+    a geocoding, and its format must be supported by SNAP.
+</p>
 <br>
-<hr>
+
+<p><a href="SlopeCalculationProcessorDescription.html">SlopeCalculation Processor Description</a></p>
+<p><a href="SlopeCalculationAlgorithmDescription.html">SlopeCalculation Algorithm Specification</a></p>
+<p><a href="SlopeCalculationCommandLine.html">Processing from the Command Line</a></p>
+
 </body>
 </html>
