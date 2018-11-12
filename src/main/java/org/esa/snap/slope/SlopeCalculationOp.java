@@ -1,6 +1,7 @@
 package org.esa.snap.slope;
 
 import com.bc.ceres.core.ProgressMonitor;
+import org.apache.commons.math3.stat.StatUtils;
 import org.esa.snap.core.datamodel.*;
 import org.esa.snap.core.gpf.Operator;
 import org.esa.snap.core.gpf.OperatorException;
@@ -26,7 +27,7 @@ import java.util.Map;
  */
 @OperatorMetadata(alias = "SlopeCalculation",
         version = "0.8",
-        internal = true,
+//        internal = true,
         authors = "Tonio Fincke, Olaf Danne",
         copyright = "(c) 2018 by Brockmann Consult",
         description = "Computes slope and aspect for an arbitrary product which must contain an elevation " +
@@ -53,15 +54,19 @@ public class SlopeCalculationOp extends Operator {
     private Band elevationBand;
     private Band slopeBand;
     private Band aspectBand;
+    private Band varianceBand;
     private final static String TARGET_PRODUCT_NAME = "Slope-Calculation";
     private final static String TARGET_PRODUCT_TYPE = "slope-calculation";
     final static String SLOPE_BAND_NAME = "slope";
     final static String ASPECT_BAND_NAME = "aspect";
+    final static String VARIANCE_BAND_NAME = "elevation_variance";
     private final static String SLOPE_BAND_DESCRIPTION = "Slope of each pixel as angle";
     private final static String ASPECT_BAND_DESCRIPTION =
             "Aspect of each pixel as angle between North direction and steepest slope, clockwise";
+    private final static String VARIANCE_BAND_DESCRIPTION = "Variance of elevation over a 3x3 pixel window";
     private final static String SLOPE_BAND_UNIT = "deg [0..90]";
     private final static String ASPECT_BAND_UNIT = "deg [0..360]";
+    private final static String VARIANCE_BAND_UNIT = "m^2";
 
     @Override
     public void initialize() throws OperatorException {
@@ -98,6 +103,7 @@ public class SlopeCalculationOp extends Operator {
         }
         slopeBand = createBand(SLOPE_BAND_NAME, SLOPE_BAND_DESCRIPTION, SLOPE_BAND_UNIT);
         aspectBand = createBand(ASPECT_BAND_NAME, ASPECT_BAND_DESCRIPTION, ASPECT_BAND_UNIT);
+        varianceBand = createBand(VARIANCE_BAND_NAME, VARIANCE_BAND_DESCRIPTION, VARIANCE_BAND_UNIT);
         setTargetProduct(targetProduct);
     }
 
@@ -119,13 +125,18 @@ public class SlopeCalculationOp extends Operator {
         int sourceIndex = sourceRectangle.width;
         final Tile slopeTile = targetTiles.get(slopeBand);
         final Tile aspectTile = targetTiles.get(aspectBand);
+        final Tile varianceTile = targetTiles.get(varianceBand);
         for (int y = targetRectangle.y; y < targetRectangle.y + targetRectangle.height; y++) {
             sourceIndex++;
             for (int x = targetRectangle.x; x < targetRectangle.x + targetRectangle.width; x++) {
-                final float[] slopeAndAspect = computeSlopeAndAspect(elevationData, sourceIndex,
-                                                                     spatialResolution, sourceRectangle.width);
-                slopeTile.setSample(x, y, slopeAndAspect[0] * MathUtils.RTOD);
-                aspectTile.setSample(x, y, slopeAndAspect[1] * MathUtils.RTOD);
+                if (x == 10750 && y == 650) {
+                    System.out.println("x = " + x);
+                }
+                final float[] slopeAspectVariance = computeSlopeAspectVariance(elevationData, sourceIndex,
+                                                                          spatialResolution, sourceRectangle.width);
+                slopeTile.setSample(x, y, slopeAspectVariance[0] * MathUtils.RTOD);
+                aspectTile.setSample(x, y, slopeAspectVariance[1] * MathUtils.RTOD);
+                varianceTile.setSample(x, y, slopeAspectVariance[2]);
                 sourceIndex++;
             }
             sourceIndex++;
@@ -185,20 +196,22 @@ public class SlopeCalculationOp extends Operator {
     }
 
     /* package local for testing */
-    static float[] computeSlopeAndAspect(float[] elevationData, int sourceIndex, double spatialResolution,
-                                         int sourceWidth) {
+    static float[] computeSlopeAspectVariance(float[] elevationData, int sourceIndex, double spatialResolution,
+                                              int sourceWidth) {
 
-        float elevA1 = elevationData[sourceIndex - sourceWidth - 1];
-        float elevA2 = elevationData[sourceIndex - sourceWidth];
-        float elevA3 = elevationData[sourceIndex - sourceWidth + 1];
-        float elevA4 = elevationData[sourceIndex - 1];
-        float elevA6 = elevationData[sourceIndex + 1];
-        float elevA7 = elevationData[sourceIndex + sourceWidth - 1];
-        float elevA8 = elevationData[sourceIndex + sourceWidth];
-        float elevA9 = elevationData[sourceIndex + sourceWidth + 1];
+        double[] elev = new double[9];
+        elev[0] = elevationData[sourceIndex - sourceWidth - 1];
+        elev[1] = elevationData[sourceIndex - sourceWidth];
+        elev[2] = elevationData[sourceIndex - sourceWidth + 1];
+        elev[3] = elevationData[sourceIndex - 1];
+        elev[4] = elevationData[sourceIndex];
+        elev[5] = elevationData[sourceIndex + 1];
+        elev[6] = elevationData[sourceIndex + sourceWidth - 1];
+        elev[7] = elevationData[sourceIndex + sourceWidth];
+        elev[8] = elevationData[sourceIndex + sourceWidth + 1];
 
-        float b = (elevA3 + 2 * elevA6 + elevA9 - elevA1 - 2 * elevA4 - elevA7) / 8f;
-        float c = (elevA1 + 2 * elevA2 + elevA3 - elevA7 - 2 * elevA8 - elevA9) / 8f;
+        double b = (elev[2] + 2 * elev[5] + elev[8] - elev[0] - 2 * elev[3] - elev[6]) / 8f;
+        double c = (elev[0] + 2 * elev[1] + elev[2] - elev[6] - 2 * elev[7] - elev[8]) / 8f;
         float slope = (float) Math.atan(Math.sqrt(Math.pow(b / spatialResolution, 2) +
                                                           Math.pow(c / spatialResolution, 2)));
         float aspect = (float) Math.atan2(-b, -c);
@@ -209,7 +222,10 @@ public class SlopeCalculationOp extends Operator {
         if (slope <= 0.0) {
             aspect = Float.NaN;
         }
-        return new float[]{slope, aspect};
+
+        final float variance = (float) StatUtils.variance(elev);
+
+        return new float[]{slope, aspect, variance};
     }
 
     /* package local for testing */

@@ -7,7 +7,7 @@ import static junit.framework.Assert.assertEquals;
 public class SlopeCalculationOpTest {
 
     @Test
-    public void computeSlopeAndAspect() {
+    public void testComputeSlopeAspectVariance() {
         float[] altitude = new float[]{
                 10.0f, 10.0f, 15.0f, 17.5f, 12.5f, 12.5f,
                 10.0f, 10.0f, 15.0f, 17.5f, 12.5f, 12.5f,
@@ -15,14 +15,14 @@ public class SlopeCalculationOpTest {
                 13.0f, 13.0f, 11.0f, 13.0f, 14.0f, 14.0f,
                 14.0f, 14.0f, 12.0f, 14.0f, 11.0f, 11.0f,
                 14.0f, 14.0f, 12.0f, 14.0f, 11.0f, 11.0f};
-        final float[] slopeAndAspect_7 = SlopeCalculationOp.computeSlopeAndAspect(altitude, 7, 10, 6);
-        final float[] slopeAndAspect_8 = SlopeCalculationOp.computeSlopeAndAspect(altitude, 8, 10, 6);
-        final float[] slopeAndAspect_10 = SlopeCalculationOp.computeSlopeAndAspect(altitude, 10, 10, 6);
-        final float[] slopeAndAspect_15 = SlopeCalculationOp.computeSlopeAndAspect(altitude, 15, 10, 6);
-        final float[] slopeAndAspect_22 = SlopeCalculationOp.computeSlopeAndAspect(altitude, 22, 10, 6);
-        final float[] slopeAndAspect_25 = SlopeCalculationOp.computeSlopeAndAspect(altitude, 25, 10, 6);
-        final float[] slopeAndAspect_27 = SlopeCalculationOp.computeSlopeAndAspect(altitude, 27, 10, 6);
-        final float[] slopeAndAspect_28 = SlopeCalculationOp.computeSlopeAndAspect(altitude, 28, 10, 6);
+        final float[] slopeAndAspect_7 = SlopeCalculationOp.computeSlopeAspectVariance(altitude, 7, 10, 6);
+        final float[] slopeAndAspect_8 = SlopeCalculationOp.computeSlopeAspectVariance(altitude, 8, 10, 6);
+        final float[] slopeAndAspect_10 = SlopeCalculationOp.computeSlopeAspectVariance(altitude, 10, 10, 6);
+        final float[] slopeAndAspect_15 = SlopeCalculationOp.computeSlopeAspectVariance(altitude, 15, 10, 6);
+        final float[] slopeAndAspect_22 = SlopeCalculationOp.computeSlopeAspectVariance(altitude, 22, 10, 6);
+        final float[] slopeAndAspect_25 = SlopeCalculationOp.computeSlopeAspectVariance(altitude, 25, 10, 6);
+        final float[] slopeAndAspect_27 = SlopeCalculationOp.computeSlopeAspectVariance(altitude, 27, 10, 6);
+        final float[] slopeAndAspect_28 = SlopeCalculationOp.computeSlopeAspectVariance(altitude, 28, 10, 6);
 
         float[] expectedSlope = new float[]{
                 0.21798114f, 0.32035214f, 0.11440312f, 0.22131443f,
@@ -34,6 +34,9 @@ public class SlopeCalculationOpTest {
                 -0.95054686f, -2.12064958f, 3.01189017f, 1.57079637f,
                 0.78539819f, -2.3561945f, -2.67794514f, 2.67794514f,
                 1.10714877f, -0.f, Float.NaN, 2.3561945f};
+
+        float[] expectedVariance = new float[]{
+                4.75f, 4.923611f, 1.25f};
 
         assertEquals(slopeAndAspect_7[0], expectedSlope[0], 1e-7);
         assertEquals(slopeAndAspect_8[0], expectedSlope[1], 1e-7);
@@ -51,6 +54,10 @@ public class SlopeCalculationOpTest {
         assertEquals(slopeAndAspect_25[1], expectedAspect[12], 1e-8);
         assertEquals(slopeAndAspect_27[1], expectedAspect[14], 1e-8);
         assertEquals(slopeAndAspect_28[1], expectedAspect[15], 1e-8);
+
+        assertEquals(slopeAndAspect_7[2], expectedVariance[0], 1e-6);
+        assertEquals(slopeAndAspect_10[2], expectedVariance[1], 1e-6);
+        assertEquals(slopeAndAspect_25[2], expectedVariance[2], 1e-6);
     }
 
     @Test

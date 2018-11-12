@@ -72,6 +72,7 @@ public class SlopeCalculationIntegrationTest {
 
         assertEquals(true, targetProduct.containsBand(SlopeCalculationOp.SLOPE_BAND_NAME));
         assertEquals(true, targetProduct.containsBand(SlopeCalculationOp.ASPECT_BAND_NAME));
+        assertEquals(true, targetProduct.containsBand(SlopeCalculationOp.VARIANCE_BAND_NAME));
 
         final Band slopeBand = targetProduct.getBand(SlopeCalculationOp.SLOPE_BAND_NAME);
         final Band aspectBand = targetProduct.getBand(SlopeCalculationOp.ASPECT_BAND_NAME);
