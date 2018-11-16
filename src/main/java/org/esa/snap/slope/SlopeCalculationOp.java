@@ -113,35 +113,31 @@ public class SlopeCalculationOp extends Operator {
         final Rectangle sourceRectangle = getSourceRectangle(targetRectangle);
         final BorderExtender borderExtender = BorderExtender.createInstance(BorderExtender.BORDER_COPY);
         final Tile elevationTile = getSourceTile(elevationBand, sourceRectangle, borderExtender);
-        final float[] elevationData = getAsFloatArray(elevationTile);
-        float[] sourceLatitudes = new float[(int) (sourceRectangle.getWidth() * sourceRectangle.getHeight())];
-        float[] sourceLongitudes = new float[(int) (sourceRectangle.getWidth() * sourceRectangle.getHeight())];
-        ((CrsGeoCoding) getSourceProduct().getSceneGeoCoding()).getPixels((int) sourceRectangle.getMinX(),
-                                                                          (int) sourceRectangle.getMinY(),
-                                                                          (int) sourceRectangle.getWidth(),
-                                                                          (int) sourceRectangle.getHeight(),
-                                                                          sourceLatitudes,
-                                                                          sourceLongitudes);
-        int sourceIndex = sourceRectangle.width;
+        double[] elevationData = new double[9];
+
         final Tile slopeTile = targetTiles.get(slopeBand);
         final Tile aspectTile = targetTiles.get(aspectBand);
         final Tile varianceTile = targetTiles.get(varianceBand);
         for (int y = targetRectangle.y; y < targetRectangle.y + targetRectangle.height; y++) {
-            sourceIndex++;
             for (int x = targetRectangle.x; x < targetRectangle.x + targetRectangle.width; x++) {
-                if (x == 10750 && y == 650) {
-                    System.out.println("x = " + x);
-                }
-                final float[] slopeAspectVariance = computeSlopeAspectVariance(elevationData, sourceIndex,
-                                                                          spatialResolution, sourceRectangle.width);
+                elevationData[0] = elevationTile.getSampleFloat(x-1, y-1);
+                elevationData[1] = elevationTile.getSampleFloat(x, y-1);
+                elevationData[2] = elevationTile.getSampleFloat(x+1, y-1);
+                elevationData[3] = elevationTile.getSampleFloat(x-1, y);
+                elevationData[4] = elevationTile.getSampleFloat(x, y);
+                elevationData[5] = elevationTile.getSampleFloat(x+1, y);
+                elevationData[6] = elevationTile.getSampleFloat(x-1, y+1);
+                elevationData[7] = elevationTile.getSampleFloat(x, y+1);
+                elevationData[8] = elevationTile.getSampleFloat(x+1, y+1);
+
+                final float[] slopeAspectVariance = computeSlopeAspectVariance(elevationData, spatialResolution);
                 slopeTile.setSample(x, y, slopeAspectVariance[0] * MathUtils.RTOD);
                 aspectTile.setSample(x, y, slopeAspectVariance[1] * MathUtils.RTOD);
                 varianceTile.setSample(x, y, slopeAspectVariance[2]);
-                sourceIndex++;
             }
-            sourceIndex++;
         }
     }
+
 
     /**
      * Computes product spatial resolution from great circle distances at the product edges.
@@ -196,19 +192,7 @@ public class SlopeCalculationOp extends Operator {
     }
 
     /* package local for testing */
-    static float[] computeSlopeAspectVariance(float[] elevationData, int sourceIndex, double spatialResolution,
-                                              int sourceWidth) {
-
-        double[] elev = new double[9];
-        elev[0] = elevationData[sourceIndex - sourceWidth - 1];
-        elev[1] = elevationData[sourceIndex - sourceWidth];
-        elev[2] = elevationData[sourceIndex - sourceWidth + 1];
-        elev[3] = elevationData[sourceIndex - 1];
-        elev[4] = elevationData[sourceIndex];
-        elev[5] = elevationData[sourceIndex + 1];
-        elev[6] = elevationData[sourceIndex + sourceWidth - 1];
-        elev[7] = elevationData[sourceIndex + sourceWidth];
-        elev[8] = elevationData[sourceIndex + sourceWidth + 1];
+    static float[] computeSlopeAspectVariance(double[] elev, double spatialResolution) {
 
         double b = (elev[2] + 2 * elev[5] + elev[8] - elev[0] - 2 * elev[3] - elev[6]) / 8f;
         double c = (elev[0] + 2 * elev[1] + elev[2] - elev[6] - 2 * elev[7] - elev[8]) / 8f;
@@ -216,7 +200,7 @@ public class SlopeCalculationOp extends Operator {
                                                           Math.pow(c / spatialResolution, 2)));
         float aspect = (float) Math.atan2(-b, -c);
         if (aspect < 0.0f) {
-//             map from [-180, 180] into [0, 360], see e.g. https://www.e-education.psu.edu/geog480/node/490
+            // map from [-180, 180] into [0, 360], see e.g. https://www.e-education.psu.edu/geog480/node/490
             aspect += 2.0 * Math.PI;
         }
         if (slope <= 0.0) {
@@ -227,6 +211,7 @@ public class SlopeCalculationOp extends Operator {
 
         return new float[]{slope, aspect, variance};
     }
+
 
     /* package local for testing */
     static float computeOrientation(float[] latData, float[] lonData, int sourceIndex) {
@@ -251,37 +236,6 @@ public class SlopeCalculationOp extends Operator {
         targetProduct.setEndTime(sourceProduct.getEndTime());
 
         return targetProduct;
-    }
-
-    private static float[] getAsFloatArray(Tile tile) {
-        ProductData dataBuffer = tile.getDataBuffer();
-        float[] dataArrFloat = new float[dataBuffer.getNumElems()];
-        switch (dataBuffer.getType()) {
-            case ProductData.TYPE_INT16:
-                for (int i = 0; i < dataBuffer.getNumElems(); i++) {
-                    dataArrFloat[i] = (float) tile.getDataBufferShort()[i];
-                }
-                break;
-            case ProductData.TYPE_INT32:
-                for (int i = 0; i < dataBuffer.getNumElems(); i++) {
-                    dataArrFloat[i] = (float) tile.getDataBufferInt()[i];
-                }
-                break;
-            case ProductData.TYPE_FLOAT32:
-                for (int i = 0; i < dataBuffer.getNumElems(); i++) {
-                    dataArrFloat[i] = tile.getDataBufferFloat()[i];
-                }
-                break;
-            case ProductData.TYPE_FLOAT64:
-                for (int i = 0; i < dataBuffer.getNumElems(); i++) {
-                    dataArrFloat[i] = (float) tile.getDataBufferDouble()[i];
-                }
-                break;
-            default:
-                throw new OperatorException("Source product data type '" + dataBuffer.getTypeString() +
-                                                    "' not supported.");
-        }
-        return dataArrFloat;
     }
 
     private Band createBand(String bandName, String description, String unit) {

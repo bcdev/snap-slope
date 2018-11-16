@@ -9,7 +9,7 @@
                 <attr name="delegate" methodvalue="org.esa.snap.core.gpf.ui.DefaultOperatorAction.create"/>
                 <attr name="displayName" stringvalue="Slope Calculation"/>
                 <attr name="operatorName" stringvalue="SlopeCalculation"/>
-                <attr name="dialogTitle" stringvalue="Slope Calculation v0.91"/>
+                <attr name="dialogTitle" stringvalue="Slope Calculation v0.92"/>
                 <attr name="targetProductNameSuffix" stringvalue="_slope"/>
                 <attr name="helpId" stringvalue="slopeCalculation"/>
             </file>
