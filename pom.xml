@@ -21,7 +21,7 @@
 
     <groupId>org.esa.snap</groupId>
     <artifactId>snap-slope</artifactId>
-    <version>0.92-SNAPSHOT</version>
+    <version>1.0</version>
 
     <name>SNAP Slope</name>
     <packaging>nbm</packaging>

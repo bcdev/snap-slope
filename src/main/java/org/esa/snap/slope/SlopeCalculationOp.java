@@ -26,7 +26,7 @@ import java.util.Map;
  * @author TonioF, olafd
  */
 @OperatorMetadata(alias = "SlopeCalculation",
-        version = "0.8",
+        version = "1.0",
 //        internal = true,
         authors = "Tonio Fincke, Olaf Danne",
         copyright = "(c) 2018 by Brockmann Consult",
